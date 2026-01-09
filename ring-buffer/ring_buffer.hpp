@@ -1,3 +1,6 @@
+#ifndef RING_BUFFER_HPP
+#define RING_BUFFER_HPP
+
 #include <vector>
 #include <optional>
 #include <mutex>
@@ -60,3 +63,5 @@ public:
     bool is_full() const { std::lock_guard<std::mutex> lock(mtx_); return count >= capacity; }
     std::size_t size() const { std::lock_guard<std::mutex> lock(mtx_); return count; }
 };
+
+#endif // RING_BUFFER_HPP
