@@ -17,7 +17,7 @@ This repository serves as my personal technical laboratory. Here, I document dee
 
 | Topic | Key Concept | Implementation / Note |
 | :--- | :--- | :--- |
-| **Ring Buffer** | Bitwise optimization & $2^n$ capacity | [View Code](./ring-buffer/RingBuffer.hpp) |
+| **Ring Buffer** | Bitwise optimization & $2^n$ capacity | [View Code](./ring-buffer/ring_buffer.hpp) |
 | **Concurrency** | **Waitable Pattern** via `std::condition_variable` | [View Code](./thread-safe-ring-buffer/thread-safe-ring-buffer.hpp) |
 | **LRU Cache** | $O(1)$ Hash-Map & List composition | *Coming Soon* |
 | **Applied Math** | Numerical analysis for sensor fusion | *Planned* |
