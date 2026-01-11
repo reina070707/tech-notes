@@ -17,15 +17,18 @@ This repository serves as my personal technical laboratory. Here, I document dee
 
 | Topic | Key Concept | Implementation / Note |
 | :--- | :--- | :--- |
-| **Ring Buffer** | Bitwise optimization & $2^n$ capacity | [View Code](./RingBuffer.cpp) |
+| **Ring Buffer** | Bitwise optimization & $2^n$ capacity | [View Code](./ring-buffer/RingBuffer.hpp) |
+| **Concurrency** | **Waitable Pattern** via `std::condition_variable` | [View Code](./thread-safe-ring-buffer/thread-safe-ring-buffer.hpp) |
 | **LRU Cache** | $O(1)$ Hash-Map & List composition | *Coming Soon* |
-| **Concurrency** | Lock-free data structures & Mutex design | *In Progress* |
 | **Applied Math** | Numerical analysis for sensor fusion | *Planned* |
 
 ### 🚀 Highlight: Optimized Ring Buffer
 My recent implementation of a Ring Buffer utilizes bitwise AND for index incrementing:
 $$index = (index + 1) \& (capacity - 1)$$
 This optimization requires the capacity to be a power of 2 ($2^n$), significantly reducing CPU cycles by avoiding the modulo (%) operator.
+
+### 💡 Highlight: Thread-Safe Synchronization
+Beyond algorithmic speed, I implemented a **Waitable Ring Buffer** that eliminates CPU-heavy busy-waiting. By utilizing `std::condition_variable`, threads remain in a suspended state until data is available, ensuring optimal resource management—a critical pattern for power-constrained robotics systems.
 
 ---
 
@@ -39,7 +42,7 @@ This optimization requires the capacity to be a power of 2 ($2^n$), significantl
 ## 🌸 About the Author
 - **Reina Hirata**
 - M.S. in Applied Mathematics (Waseda Univ.)
-- Incoming Lead Software Engineer at **Preferred Robotics** (March 2026)
+- Incoming Lead Software Engineer in Test at Robotics company (March 2026)
 
 ---
 [<img src="https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin">](https://www.linkedin.com/in/reina-hirata-293b57115) &nbsp; [<img src="https://img.shields.io/badge/LAPRAS-Score-42C4C2?style=flat">](https://lapras.com/public/reinahirata07) &nbsp; [<img src="https://img.shields.io/badge/Algorithm_Daily-Repo-green?style=flat&logo=github">](../algorithm-daily)
