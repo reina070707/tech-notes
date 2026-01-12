@@ -12,7 +12,8 @@ My primary focus is a modern C++ implementation of a Ring Buffer that achieves m
 ### 🔹 Mathematical Optimization: The Modulo Trick
 To eliminate the high CPU cost of the modulo operator (`%`), I utilize a bitwise AND mask for index management. This reduces the increment operation from ~20-40 CPU cycles to **exactly 1 cycle**.
 
-$$ \text{index} = (\text{index} + 1) \text{ \& } (\text{capacity} - 1) $$
+> **Optimization Formula**:
+> `index = (index + 1) & (capacity - 1)`
 
 > **Design Choice**: To ensure this optimization is always valid, the constructor automatically rounds up the requested capacity to the nearest power of 2 ($2^n$) using C++20's `std::bit_ceil`.
 
