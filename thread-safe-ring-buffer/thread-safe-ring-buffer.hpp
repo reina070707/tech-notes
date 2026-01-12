@@ -38,9 +38,12 @@ public:
         std::lock_guard<std::mutex> lock(mtx_);
 
         buffer_[tail_] = std::move(item);
+        if (size_ >= capacity_) {
+            head_ = (head_ + 1) & (capacity_ - 1);
+        } else {
+            size_++;
+        }
         tail_ = (tail_ + 1) & (capacity_ - 1);
-        size_++;
-
         // notify
         cond_.notify_one();
     }
