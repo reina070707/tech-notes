@@ -45,7 +45,9 @@ Achieved 100.0% line and function coverage.
 ```bash
 # To generate coverage report (requires lcov)
 lcov --capture --directory . --output-file coverage.info --ignore-errors inconsistent,category
+lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/v1/*' --output-file coverage_filtered.info
 genhtml coverage_filtered.info --output-directory out --ignore-errors inconsistent,category
+open out/index.html
 ```
 
 ## ⚖️ License
