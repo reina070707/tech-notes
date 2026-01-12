@@ -1,3 +1,6 @@
+#ifndef THREAD_SAFE_RING_BUFFER_HPP
+#define THREAD_SAFE_RING_BUFFER_HPP
+
 #include <bit>
 #include <stdexcept>
 #include <mutex>
@@ -15,7 +18,7 @@ private:
     size_t size_ = 0;
     size_t capacity_;
 
-    std::mutex mtx_;
+    mutable std::mutex mtx_;
     std::condition_variable_any cond_;
 
 public:
@@ -55,4 +58,9 @@ public:
         size_--;
         return value;
     }
+
+    std::size_t capacity() const { std::lock_guard<std::mutex> lock(mtx_); return capacity_; }
+    std::size_t size() const { std::lock_guard<std::mutex> lock(mtx_); return size_; }
 };
+
+#endif //THREAD_SAFE_RING_BUFFER_HPP 
