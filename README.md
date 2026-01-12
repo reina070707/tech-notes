@@ -24,7 +24,9 @@ This repository serves as my personal technical laboratory. Here, I document dee
 
 ### 🚀 Highlight: Optimized Ring Buffer
 My recent implementation of a Ring Buffer utilizes bitwise AND for index incrementing:
-$$index = (index + 1) \& (capacity - 1)$$
+
+$$ \text{index} = (\text{index} + 1) \text{ \& } (\text{capacity} - 1) $$
+
 This optimization requires the capacity to be a power of 2 ($2^n$), significantly reducing CPU cycles by avoiding the modulo (%) operator.
 
 ### 💡 Highlight: Thread-Safe Synchronization
