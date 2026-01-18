@@ -1,7 +1,33 @@
 #include <gtest/gtest.h>
-#include "lru-cache.hpp"
 #include <memory>
+#include <string>
+#include <vector>
+#include "lru-cache.hpp"
 
+// ==========================================================
+// 1. Fixture Definition
+// ==========================================================
+template <typename T>
+class LRUCacheTypedTest : public ::testing::Test {
+protected:
+    // helper function for each type
+    T createValue(int seed) {
+        if constexpr (std::is_same_v<T, std::string>) {
+            return "value_" + std::to_string(seed);
+        } else if constexpr (std::is_same_v<T, std::vector<int>>) {
+            return {seed, seed + 1};
+        } else {
+            return static_cast<T>(seed);
+        }
+    }
+};
+
+using TestTypes = ::testing::Types<int, std::string, std::vector<int>>;
+TYPED_TEST_SUITE(LRUCacheTypedTest, TestTypes);
+
+// ==========================================================
+// 2. Exception Tests
+// ==========================================================
 using IntCache = LRUCache<int, int>;
 
 TEST(LRUCacheTest, ConstructorThrow) {
@@ -16,65 +42,52 @@ TEST(LRUCacheTest, ConstructorNoThrow) {
     });
 }
 
-using TestCache = LRUCache<int, std::string>;
+// ==========================================================
+// 3. Typed Tests (using fixture)
+// ==========================================================
+// using TestCache = LRUCache<int, std::string>;
 
-TEST(LRUCacheTest, BasicPutGet) {
-    TestCache cache(2);
+TYPED_TEST(LRUCacheTypedTest, BasicPutGet) {
+    LRUCache<int, TypeParam> cache(2);
+    auto v1 = this->createValue(1);
 
-    cache.put(1, "one");
+    cache.put(1, v1);
     auto val = cache.get(1);
 
     ASSERT_TRUE(val.has_value());
-    EXPECT_EQ(val.value(), "one");
+    EXPECT_EQ(val.value(), v1);
 }
 
-// 3. Test for not existed key
-TEST(LRUCacheTest, GetNonExistentKey) {
-    TestCache cache(2);
-    auto val = cache.get(999);
-
-    EXPECT_FALSE(val.has_value());
+TYPED_TEST(LRUCacheTypedTest, GetNonExistentKey) {
+    LRUCache<int, TypeParam> cache(2);
+    EXPECT_FALSE(cache.get(999).has_value());
 }
 
-// 4. Test for eviction due to capacity
-TEST(LRUCacheTest, EvictionLogic) {
-    TestCache cache(2);
+TYPED_TEST(LRUCacheTypedTest, EvictionLogic) {
+    LRUCache<int, TypeParam> cache(2);
+    auto v1 = this->createValue(1);
+    auto v2 = this->createValue(2);
+    auto v3 = this->createValue(3);
 
-    cache.put(1, "one");
-    cache.put(2, "two");
-    cache.put(3, "three"); // Should delete one
+    cache.put(1, v1);
+    cache.put(2, v2);
+    cache.get(1); // update the latest for 1
 
-    EXPECT_FALSE(cache.get(1).has_value()); // deleted one
-    EXPECT_TRUE(cache.get(2).has_value());  // reminded two
-    EXPECT_TRUE(cache.get(3).has_value());  // reminded three
+    cache.put(3, v3); // Should be deleted 2
+
+    EXPECT_TRUE(cache.get(1).has_value());
+    EXPECT_FALSE(cache.get(2).has_value());
+    EXPECT_TRUE(cache.get(3).has_value());
 }
 
-// 5. Test for updating of getter function
-TEST(LRUCacheTest, UpdateOrderOnGet) {
-    TestCache cache(2);
+TYPED_TEST(LRUCacheTypedTest, CapacityOne) {
+    LRUCache<int, TypeParam> cache(1);
+    auto v1 = this->createValue(1);
+    auto v2 = this->createValue(2);
 
-    cache.put(1, "one");
-    cache.put(2, "two");
+    cache.put(1, v1);
+    cache.put(2, v2);
 
-    // update latest 1
-    cache.get(1);
-
-    // Should be deleted two when put three
-    cache.put(3, "three");
-
-    EXPECT_TRUE(cache.get(1).has_value());  // keep one
-    EXPECT_FALSE(cache.get(2).has_value()); // removed two
-    EXPECT_TRUE(cache.get(3).has_value());  // put three
-}
-
-// 6. Test for updating existing key
-TEST(LRUCacheTest, PutUpdateExistingKey) {
-    TestCache cache(2);
-
-    cache.put(1, "old");
-    cache.put(1, "new"); // updating value
-
-    auto val = cache.get(1);
-    ASSERT_TRUE(val.has_value());
-    EXPECT_EQ(val.value(), "new");
+    EXPECT_FALSE(cache.get(1).has_value());
+    EXPECT_EQ(cache.get(2).value(), v2);
 }

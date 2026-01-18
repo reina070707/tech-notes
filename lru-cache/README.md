@@ -14,18 +14,40 @@ A modern, header-only Least Recently Used (LRU) Cache implementation in C++17. T
 ## 🚀 Usage
 
 ```cpp
-#include "ring_buffer.hpp"
+#include "lru-cache.hpp"
 #include <iostream>
+#include <string>
 
 int main() {
-    RingBuffer<int> rb(3);
-    rb.push(1);
-    rb.push(2);
+    // Instantiate with a capacity of 2
+    LRUCache<int, std::string> cache(2);
 
-    std::cout << *rb.pop() << std::endl; // Output: 1
+    cache.put(1, "one");
+    cache.put(2, "two");
+
+    // Accessing an element makes it "most recently used"
+    if (auto val = cache.get(1)) {
+        std::cout << "Found: " << *val << std::endl; // Output: one
+    }
+
+    // This will evict key 2 because key 1 was recently accessed
+    cache.put(3, "three");
+
+    if (!cache.get(2)) {
+        std::cout << "Key 2 was evicted." << std::endl;
+    }
+
     return 0;
 }
 ```
+
+## ✅ Robustness Verification (Typed Tests)
+
+Using GoogleTest's **Type-Parameterized Tests**, the core logic is verified against multiple data types to ensure template reliability:
+
+- **Primitives**: `int` (Ensures zero-overhead for simple types).
+- **Heap-Allocated**: `std::string` (Ensures correct resource management).
+- **Complex Containers**: `std::vector<int>` (Ensures safety with move semantics and RAII).
 
 ## 🛠 Build and Test
 
