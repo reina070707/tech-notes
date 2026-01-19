@@ -1,9 +1,10 @@
 #ifndef LRU_CACHE_HPP
 #define LRU_CACHE_HPP
 
-#include <stdexcept>
 #include <list>
+#include <mutex>
 #include <optional>
+#include <stdexcept>
 #include <unordered_map>
 
 template <typename K, typename V>
@@ -12,6 +13,7 @@ private:
     size_t capacity_;
     std::list<std::pair<K, V>> items_; // K: key, V: value
     std::unordered_map<K, typename std::list<std::pair<K, V>>::iterator> cache_;
+    mutable std::mutex mutex_;
 
 public:
     explicit LRUCache(size_t capacity) : capacity_(capacity) {
@@ -21,6 +23,8 @@ public:
     }
 
     std::optional<V> get(const K& key) {
+        std::lock_guard<std::mutex> lock(mutex_);
+
         auto it = cache_.find(key);
         if (it == cache_.end()) return std::nullopt;
 
@@ -29,6 +33,8 @@ public:
     }
 
     void put(const K& key, const V& value) {
+        std::lock_guard<std::mutex> lock(mutex_);
+
         auto it = cache_.find(key);
         if (it != cache_.end()) {
             it->second->second = value;
