@@ -1,13 +1,20 @@
 #ifndef LRU_CACHE_HPP
 #define LRU_CACHE_HPP
 
+#include <concepts>
 #include <list>
 #include <mutex>
 #include <optional>
 #include <stdexcept>
 #include <unordered_map>
 
-template <typename K, typename V>
+// concepts of available for hash
+template <typename T>
+concept Hashable = requires(T a) {
+    { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
+};
+
+template <Hashable K, std::movable V>
 class LRUCache {
 private:
     size_t capacity_;
@@ -32,12 +39,12 @@ public:
         return it->second->second;
     }
 
-    void put(const K& key, const V& value) {
+    void put(const K& key, V value) {
         std::lock_guard<std::mutex> lock(mutex_);
 
         auto it = cache_.find(key);
         if (it != cache_.end()) {
-            it->second->second = value;
+            it->second->second = std::move(value);
             items_.splice(items_.begin(), items_, it->second);
             return;
         }
@@ -47,7 +54,7 @@ public:
             items_.pop_back();
         }
 
-        items_.emplace_front(key, value);
+        items_.emplace_front(key, std::move(value));
         cache_[key] = items_.begin();
     }
 };
